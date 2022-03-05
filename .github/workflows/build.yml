@@ -1,8 +1,7 @@
 name: build caddy
 
 on:
-  schedule:
-    - cron: '30 5 * * 1'
+  push
 
 jobs:
   build:
