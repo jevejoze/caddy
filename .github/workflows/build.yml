@@ -12,6 +12,7 @@ jobs:
       - uses: actions/setup-go@v2
       - name: Build
         run: |
+          export GO111MODULE=on
           go install github.com/caddyserver/xcaddy/cmd/xcaddy@latest
           xcaddy build --with github.com/caddyserver/forwardproxy@caddy2=github.com/klzgrad/forwardproxy@naive
       - uses: EndBug/add-and-commit@v8
