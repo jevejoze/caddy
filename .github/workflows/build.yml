@@ -36,14 +36,15 @@ jobs:
         run: |
           export GOARCH=${{ matrix.config.GOARCH }}
           export GOOS=${{ matrix.config.GOOS }}
-          ~/go/bin/xcaddy build --with github.com/caddyserver/forwardproxy@caddy2=github.com/klzgrad/forwardproxy@naive --with github.com/imgk/caddy-trojan
+          ~/go/bin/xcaddy build \
+            --with github.com/caddyserver/forwardproxy@caddy2=github.com/klzgrad/forwardproxy@naive \
+            --with github.com/imgk/caddy-trojan \
+            --output ./caddy-${{ matrix.config.GOARCH }}
           
       - name: Rename
         run: |
-          mv ./caddy ./caddy-${{ matrix.config.GOARCH }}
           tar -zcvf ./caddy-${{ matrix.config.GOARCH }}.tar.gz ./caddy-${{ matrix.config.GOARCH }}
-          git pull
-
+          
       - uses: EndBug/add-and-commit@v8
         with:
           add: 'caddy*'
