@@ -46,5 +46,5 @@ jobs:
 
       - uses: EndBug/add-and-commit@v8
         with:
-          add: 'caddy'-${{ matrix.config.GOARCH }}
+          add: 'caddy*'
           author_name: 'github_action'
