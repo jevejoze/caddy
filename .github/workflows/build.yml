@@ -6,17 +6,38 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        config:
+        - {
+            name: "linux-amd64",
+            GOARCH: amd64,
+            GOOS: linux,
+            release: true
+          }
+        - {
+            name: "linux-arm64",
+            GOARCH: arm64,
+            GOOS: linux,
+            release: true
+          }
 
     steps:
       - uses: actions/checkout@v3
       - uses: actions/setup-go@v3
+			  with:
+					go-version: '1.19'
+					check-latest: true
+			- name: Install xcaddy
+        run: go install github.com/caddyserver/xcaddy/cmd/xcaddy@latest
+				
       - name: Build
         run: |
-          export GO111MODULE=on
-          go version
-          go install github.com/caddyserver/xcaddy/cmd/xcaddy@latest
-          xcaddy build --with github.com/caddyserver/forwardproxy@caddy2=github.com/klzgrad/forwardproxy@naive --with github.com/imgk/caddy-trojan
+				  export GOARCH=${{ matrix.config.GOARCH }}
+					export GOOS=${{ matrix.config.GOOS }}
+          ~/go/bin/xcaddy build --with github.com/caddyserver/forwardproxy@caddy2=github.com/klzgrad/forwardproxy@naive --with github.com/imgk/caddy-trojan
       - uses: EndBug/add-and-commit@v8
         with:
-          add: 'caddy'
+          add: 'caddy*'
           author_name: 'github_action'
