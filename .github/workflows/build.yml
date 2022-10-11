@@ -12,7 +12,8 @@ jobs:
       - uses: actions/setup-go@v3
       - name: Build
         run: |
-          export GO111MODULE=on GOARCH=arm
+          export GO111MODULE=on
+          go version
           go install github.com/caddyserver/xcaddy/cmd/xcaddy@latest
           xcaddy build --with github.com/caddyserver/forwardproxy@caddy2=github.com/klzgrad/forwardproxy@naive --with github.com/imgk/caddy-trojan
       - uses: EndBug/add-and-commit@v8
