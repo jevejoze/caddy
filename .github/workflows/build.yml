@@ -11,20 +11,14 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        config:
-        - {
-            name: "linux-amd64",
-            GOARCH: amd64,
-            GOOS: linux,
-            release: true
-          }
-        - {
-            name: "linux-arm64",
-            GOARCH: arm64,
-            GOOS: linux,
-            release: true
-          }
-
+        include:
+          - name: "linux-amd64"
+            GOARCH: amd64
+            GOOS: linux
+          - name: "linux-arm64"
+            GOARCH: arm64
+            GOOS: linux
+            
     steps:
       - uses: actions/checkout@v3
       - uses: actions/setup-go@v3
@@ -36,18 +30,20 @@ jobs:
 
       - name: Build
         run: |
-          export GOARCH=${{ matrix.config.GOARCH }}
-          export GOOS=${{ matrix.config.GOOS }}
+          export GOARCH=${{ matrix.GOARCH }}
+          export GOOS=${{ matrix.GOOS }}
           ~/go/bin/xcaddy build \
             --with github.com/caddyserver/forwardproxy=github.com/klzgrad/forwardproxy@naive \
             --with github.com/imgk/caddy-trojan \
           
       - name: Tar
         run: |
-          tar -zcvf ./caddy-${{ matrix.config.GOARCH }}.tar.gz ./caddy
+          tar -zcvf ./caddy-${{ matrix.GOARCH }}.tar.gz ./caddy
 
-      - name: Upload assets
-        if: ${{ github.event_name == 'release' }}
-        run: gh release upload "${GITHUB_REF##*/}" caddy-${{ matrix.config.GOARCH }}.tar.xz --clobber
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Upload binaries to release
+        uses: svenstaro/upload-release-action@v2
+        with:
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          file: caddy-${{ matrix.GOARCH }}.tar.gz
+          asset_name: caddy-${{ matrix.GOARCH }}
+          tag: ${{ github.ref }}
