@@ -45,12 +45,9 @@ jobs:
       - name: Tar
         run: |
           tar -zcvf ./caddy-${{ matrix.config.GOARCH }}.tar.gz ./caddy
-      
-      - name: Upload binaries to release
-        uses: svenstaro/upload-release-action@v2
-        with:
-          repo_token: ${{ secrets.GITHUB_TOKEN }}
-          file: ./caddy*
-          tag: ${{ github.ref }}
-          overwrite: true
-          file_glob: true
+
+      - name: Upload assets
+        if: ${{ github.event_name == 'release' }}
+        run: gh release upload "${GITHUB_REF##*/}" caddy-${{ matrix.config.GOARCH }}.tar.xz --clobber
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
